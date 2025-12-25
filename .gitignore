@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+yarn.lock
+
+# Keep package-lock.json for reproducible builds
+# package-lock.json
+
+# Build output
+dist/
+build/
+*.js
+*.js.map
+*.d.ts
+!scripts/*.js
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.test
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+temp/
+tmp/
+*.pid
+*.seed
+*.pid.lock
+
+# Claude/Amp
+.claude/
+
+# Keep these
+!.env.example
+!render.yaml

@@ -1,0 +1,71 @@
+# 🎅 Santa's Tokenomics Bot - Render Deployment Configuration
+# Deploy as a Background Worker on Render.com
+
+services:
+  - type: worker
+    name: santas-tokenomics-bot
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: DRY_RUN
+        value: false
+      # Solana RPC (set in Render dashboard - DO NOT commit real values)
+      - key: RPC_ENDPOINT
+        sync: false
+      - key: RPC_WEBSOCKET_ENDPOINT
+        sync: false
+      # Token Info (set in Render dashboard)
+      - key: TOKEN_ADDRESS
+        sync: false
+      - key: BONDING_CURVE_ADDRESS
+        sync: false
+      - key: ASSOCIATED_BONDING_CURVE
+        sync: false
+      # Wallets (set in Render dashboard - SENSITIVE!)
+      - key: CREATOR_PRIVATE_KEY
+        sync: false
+      - key: VOLUME_WALLET_KEYS
+        sync: false
+      - key: BURN_WALLET_PRIVATE_KEY
+        sync: false
+      - key: TREASURY_WALLET_ADDRESS
+        sync: false
+      # Fee Collection
+      - key: MINIMUM_CLAIM_THRESHOLD
+        value: "0.01"
+      - key: FEE_CHECK_INTERVAL
+        value: "30000"
+      # Volume Creation
+      - key: MIN_TRADE_AMOUNT
+        value: "0.001"
+      - key: MAX_TRADE_AMOUNT
+        value: "0.05"
+      - key: MIN_DELAY_SECONDS
+        value: "5"
+      - key: MAX_DELAY_SECONDS
+        value: "30"
+      - key: SLIPPAGE_BPS
+        value: "300"
+      # Buyback & Burn
+      - key: MAX_BURN_PER_TX
+        value: "1000000000"
+      # Airdrop
+      - key: MIN_HOLDER_THRESHOLD
+        value: "1000000"
+      - key: MIN_AIRDROP_AMOUNT
+        value: "0.001"
+      - key: MAX_RECIPIENTS_PER_RUN
+        value: "100"
+      # API
+      - key: API_PORT
+        value: "3000"
+      - key: API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "*"
