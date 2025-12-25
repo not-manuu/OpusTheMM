@@ -20,27 +20,28 @@ function WalletRow({ emoji, label, balance, address }: WalletRowProps) {
     : null;
 
   return (
-    <div className="flex items-center justify-between py-2">
-      <div className="flex items-center gap-2">
-        <span>{emoji}</span>
-        <span className="text-slate-300">{label}</span>
+    <li className="flex items-center justify-between py-3 border-b border-white/10">
+      <span className="text-lg">
+        {emoji} {label}
+      </span>
+      <div className="text-right">
         {shortAddress && (
-          <span className="text-xs text-slate-500 font-mono">{shortAddress}</span>
+          <div className="font-mono text-muted text-sm">{shortAddress}</div>
         )}
+        <span className="text-accent-gold text-lg">{(balance || 0).toFixed(4)} SOL</span>
       </div>
-      <span className="font-mono text-green-400">{(balance || 0).toFixed(4)} SOL</span>
-    </div>
+    </li>
   );
 }
 
 export function WalletBalances({ wallets, loading }: WalletBalancesProps) {
   if (loading) {
     return (
-      <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-5 animate-pulse">
-        <div className="h-6 bg-slate-700 rounded w-40 mb-4" />
+      <div className="pixel-card animate-pulse">
+        <div className="h-6 bg-[#2a2a4e] w-40 mb-4" />
         <div className="space-y-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-6 bg-slate-700 rounded" />
+            <div key={i} className="h-10 bg-[#2a2a4e]" />
           ))}
         </div>
       </div>
@@ -49,8 +50,8 @@ export function WalletBalances({ wallets, loading }: WalletBalancesProps) {
 
   if (!wallets) {
     return (
-      <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-5">
-        <p className="text-slate-500">Failed to load wallet data</p>
+      <div className="pixel-card">
+        <p className="text-muted">Failed to load wallet data</p>
       </div>
     );
   }
@@ -63,15 +64,13 @@ export function WalletBalances({ wallets, loading }: WalletBalancesProps) {
   const treasury = reindeer.treasury || { emoji: '\u{1F3E6}', balance: 0, address: '' };
 
   return (
-    <div className="bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden">
-      <div className="px-5 py-3 border-b border-slate-700">
-        <h3 className="font-semibold text-slate-300 flex items-center gap-2">
-          <span>&#128176;</span>
-          Wallet Balances
-        </h3>
+    <div className="pixel-card">
+      <div className="font-pixel-headline text-sm text-white mb-5 flex items-center gap-2">
+        <span>&#128176;</span>
+        Wallet Balances
       </div>
 
-      <div className="px-5 py-3 divide-y divide-slate-700/50">
+      <ul className="list-none">
         <WalletRow
           emoji="&#127877;"
           label="Master"
@@ -95,7 +94,7 @@ export function WalletBalances({ wallets, loading }: WalletBalancesProps) {
           balance={treasury.balance || 0}
           address={treasury.address}
         />
-      </div>
+      </ul>
     </div>
   );
 }

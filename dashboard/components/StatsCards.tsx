@@ -26,20 +26,29 @@ function StatCard({
   secondaryLabel,
   color,
 }: StatCardProps) {
+  const colorClass = {
+    red: 'text-accent-red',
+    blue: 'text-accent-blue',
+    orange: 'text-accent-orange',
+    green: 'text-accent-green',
+  }[color] || 'text-white';
+
   return (
-    <div className={`bg-slate-800/50 rounded-xl p-5 border border-slate-700 hover:border-${color}-500/50 transition-colors`}>
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-2xl">{emoji}</span>
-        <h3 className="font-semibold text-slate-300">{title}</h3>
-      </div>
+    <div className="pixel-card">
+      <div className="text-5xl mb-3">{emoji}</div>
+      <h2 className="font-pixel-headline text-xs text-accent-gold mb-4 uppercase">
+        {title}
+      </h2>
       <div className="space-y-2">
         <div>
-          <p className={`text-2xl font-bold text-${color}-400`}>{mainValue}</p>
-          <p className="text-xs text-slate-500">{mainLabel}</p>
+          <span className={`text-3xl font-bold block mb-1 ${colorClass}`}>
+            {mainValue}
+          </span>
+          <span className="text-muted text-lg uppercase">{mainLabel}</span>
         </div>
-        <div className="pt-2 border-t border-slate-700/50">
-          <p className="text-lg font-semibold text-slate-300">{secondaryValue}</p>
-          <p className="text-xs text-slate-500">{secondaryLabel}</p>
+        <div className="mt-4 pt-3 border-t-2 border-dashed border-[#8b9bb4] flex justify-between text-lg">
+          <span className="text-muted">{secondaryLabel}</span>
+          <span className="text-white">{secondaryValue}</span>
         </div>
       </div>
     </div>
@@ -48,10 +57,11 @@ function StatCard({
 
 function LoadingCard() {
   return (
-    <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700 animate-pulse">
-      <div className="h-8 bg-slate-700 rounded w-24 mb-3" />
-      <div className="h-8 bg-slate-700 rounded w-32 mb-2" />
-      <div className="h-4 bg-slate-700 rounded w-20" />
+    <div className="pixel-card animate-pulse">
+      <div className="h-12 bg-[#2a2a4e] mb-3 w-12" />
+      <div className="h-4 bg-[#2a2a4e] w-24 mb-4" />
+      <div className="h-8 bg-[#2a2a4e] w-32 mb-2" />
+      <div className="h-4 bg-[#2a2a4e] w-20" />
     </div>
   );
 }
@@ -59,7 +69,7 @@ function LoadingCard() {
 export function StatsCards({ stats, loading }: StatsCardsProps) {
   if (loading || !stats) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         {[...Array(4)].map((_, i) => (
           <LoadingCard key={i} />
         ))}
@@ -74,7 +84,7 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
   const airdrops = stats.airdrops || { uniqueRecipients: 0, distributionCount: 0 };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
       <StatCard
         emoji="&#127877;"
         title="SANTA"
@@ -109,7 +119,7 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
         mainLabel="Unique Recipients"
         secondaryValue={(airdrops.distributionCount || 0).toString()}
         secondaryLabel="Distributions"
-        color="purple"
+        color="green"
       />
     </div>
   );

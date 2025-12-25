@@ -6,25 +6,24 @@ interface HeaderProps {
 
 export function Header({ isConnected }: HeaderProps) {
   return (
-    <header className="bg-slate-800/50 border-b border-slate-700 px-6 py-4">
-      <div className="flex items-center justify-between max-w-7xl mx-auto">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">&#129420;</span>
-          <h1 className="text-2xl font-bold text-snow-white">
-            4Reindeer Dashboard
-          </h1>
-        </div>
+    <header className="pixel-header mb-10">
+      <h1 className="font-pixel-headline text-base md:text-lg text-accent-red flex items-center gap-4" style={{ textShadow: '2px 2px 0 #fff' }}>
+        <span className="text-2xl">&#129420;</span>
+        4Reindeer Dashboard
+      </h1>
 
-        <div className="flex items-center gap-2">
-          <span
-            className={`w-3 h-3 rounded-full ${
-              isConnected ? 'bg-green-500 pulse' : 'bg-red-500'
-            }`}
-          />
-          <span className="text-sm text-slate-400">
-            {isConnected ? 'Connected' : 'Disconnected'}
-          </span>
-        </div>
+      <div className="flex items-center gap-3 text-xl pulse">
+        <div
+          className={`w-3 h-3 ${
+            isConnected ? 'bg-[#00e676]' : 'bg-[#ff3333]'
+          }`}
+          style={{
+            boxShadow: isConnected ? '0 0 10px #00e676' : '0 0 10px #ff3333',
+          }}
+        />
+        <span className={isConnected ? 'text-accent-green' : 'text-accent-red'}>
+          {isConnected ? 'Connected' : 'Disconnected'}
+        </span>
       </div>
     </header>
   );

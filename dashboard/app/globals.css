@@ -1,16 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --foreground: #f8fafc;
-  --background: #0f172a;
+  --bg-color: #0d0d15;
+  --card-bg: #1a1a2e;
+  --text-main: #ffffff;
+  --text-muted: #8b9bb4;
+  --accent-red: #ff3333;
+  --accent-green: #00e676;
+  --accent-gold: #ffcc00;
+  --accent-blue: #3498db;
+  --accent-orange: #ff9f43;
+  --accent-purple: #a78bfa;
+  --border-width: 4px;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'VT323', monospace;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Pixel Art Font Classes */
+.font-pixel-headline {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.font-pixel-body {
+  font-family: 'VT323', monospace;
 }
 
 /* Custom scrollbar */
@@ -19,12 +41,11 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: var(--card-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
+  background: var(--text-muted);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -51,12 +72,121 @@ body {
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
+    text-shadow: 0 0 5px var(--accent-green);
   }
   50% {
     opacity: 0.5;
+    text-shadow: none;
   }
 }
 
 .pulse {
   animation: pulse 2s infinite;
 }
+
+/* Blink animation for terminal cursor */
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.blink {
+  animation: blink 1s infinite;
+}
+
+/* Pixel Card Styles */
+.pixel-card {
+  background: var(--card-bg);
+  border: var(--border-width) solid var(--text-muted);
+  padding: 20px;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  image-rendering: pixelated;
+}
+
+.pixel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0px var(--accent-red);
+  border-color: var(--text-main);
+}
+
+/* Pixel Header */
+.pixel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border: var(--border-width) solid var(--text-main);
+  background: var(--card-bg);
+  box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+}
+
+/* Terminal Styles */
+.terminal {
+  background: #000;
+  border: 4px solid var(--accent-green);
+  padding: 20px;
+  font-family: 'VT323', monospace;
+  box-shadow: inset 0 0 20px rgba(0, 230, 118, 0.2);
+}
+
+.terminal-header {
+  color: var(--accent-green);
+  border-bottom: 2px solid var(--accent-green);
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+
+/* Fee Distribution Bar */
+.progress-bar-container {
+  height: 40px;
+  width: 100%;
+  display: flex;
+  border: 4px solid #fff;
+}
+
+.bar-segment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.5rem;
+  color: #000;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.bar-segment:hover {
+  opacity: 0.8;
+}
+
+/* Snow Canvas */
+#snowCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Color utility classes */
+.text-accent-red { color: var(--accent-red); }
+.text-accent-green { color: var(--accent-green); }
+.text-accent-gold { color: var(--accent-gold); }
+.text-accent-blue { color: var(--accent-blue); }
+.text-accent-orange { color: var(--accent-orange); }
+.text-accent-purple { color: var(--accent-purple); }
+.text-muted { color: var(--text-muted); }
+
+.bg-card { background: var(--card-bg); }
+.bg-main { background: var(--bg-color); }
+
+.border-muted { border-color: var(--text-muted); }
+.border-accent-green { border-color: var(--accent-green); }

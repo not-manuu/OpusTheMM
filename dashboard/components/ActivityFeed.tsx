@@ -27,22 +27,24 @@ function getEventIcon(type: WSEventType): string {
   }
 }
 
-function getEventColor(type: WSEventType): string {
+function getEventColorClass(type: WSEventType): string {
   switch (type) {
     case 'fee_collected':
-      return 'text-red-400';
+      return 'text-accent-red';
     case 'volume':
-      return 'text-blue-400';
+      return 'text-accent-blue';
     case 'burn':
-      return 'text-orange-400';
+      return 'text-accent-orange';
     case 'airdrop':
-      return 'text-purple-400';
+      return 'text-accent-purple';
     case 'treasury':
-      return 'text-yellow-400';
+      return 'text-accent-gold';
     case 'error':
-      return 'text-red-500';
+      return 'text-accent-red';
+    case 'connected':
+      return 'text-accent-green';
     default:
-      return 'text-slate-400';
+      return 'text-muted';
   }
 }
 
@@ -57,47 +59,43 @@ function formatTime(date: Date): string {
 
 export function ActivityFeed({ events }: ActivityFeedProps) {
   return (
-    <div className="bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden">
-      <div className="px-5 py-3 border-b border-slate-700">
-        <h3 className="font-semibold text-slate-300 flex items-center gap-2">
-          <span>&#128226;</span>
-          Live Activity Feed
+    <div className="terminal h-full min-h-[280px]">
+      <div className="terminal-header flex justify-between items-center">
+        <span className="font-pixel-headline text-xs">
+          <span>&#128226;</span> Live Activity Feed
           {events.length > 0 && (
-            <span className="text-xs bg-slate-700 px-2 py-0.5 rounded-full">
+            <span className="ml-2 text-xs bg-[#00e676]/20 px-2 py-0.5">
               {events.length}
             </span>
           )}
-        </h3>
+        </span>
+        <span className="text-accent-green text-sm">v1.0</span>
       </div>
 
-      <div className="h-64 overflow-y-auto">
+      <div className="h-52 overflow-y-auto">
         {events.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-slate-500">
+          <div className="flex items-center justify-center h-full text-muted text-lg">
             <p>Waiting for events...</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-700/50">
+          <div>
             {events.map((event) => (
               <div
                 key={event.id}
-                className="activity-item px-5 py-3 hover:bg-slate-700/30 transition-colors"
+                className="activity-item py-2 text-lg"
               >
-                <div className="flex items-start gap-3">
-                  <span className="text-lg">{getEventIcon(event.type)}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`${getEventColor(event.type)} text-sm`}>
-                      {event.message}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {formatTime(event.timestamp)}
-                    </p>
-                  </div>
-                </div>
+                <span className="text-muted mr-3">{formatTime(event.timestamp)}</span>
+                <span className={getEventColorClass(event.type)}>
+                  {getEventIcon(event.type)} {event.message}
+                </span>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Blinking cursor */}
+      <div className="blink w-2.5 h-4 bg-[#00e676] mt-2 inline-block" />
     </div>
   );
 }
