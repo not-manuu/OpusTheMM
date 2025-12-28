@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Frostbyte Dashboard',
   description: 'Live tracking dashboard for the Frostbyte tokenomics bot',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
