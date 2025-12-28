@@ -1,4 +1,4 @@
-# 🚀 Setup Next Steps - Before We Build
+# ❄️ Frostbyte - Setup Next Steps
 
 Your checklist is complete! Here's what we need to do before starting the build.
 
@@ -54,8 +54,8 @@ RPC_WEBSOCKET_ENDPOINT=wss://mainnet.helius-rpc.com/?api-key=YOUR_KEY
 1. Open Telegram app
 2. Search for `@BotFather`
 3. Send `/newbot`
-4. Choose a name (e.g., "Santa's Tokenomics Bot")
-5. Choose a username (e.g., "santas_tokenomics_bot")
+4. Choose a name (e.g., "Frostbyte Bot")
+5. Choose a username (e.g., "frostbyte_bot")
 6. BotFather gives you a **Bot Token** - save it!
 
 **Get your Chat ID:**
@@ -156,7 +156,7 @@ If yes to all, **you're ready!** 🚀
 - Test connection
 
 **Phase 2-6 (4-5 hours):**
-- Build Santa + 4 Reindeer
+- Build Frostbyte modules
 - Build Backend API
 - Build Telegram bot
 
@@ -178,7 +178,7 @@ If yes to all, **you're ready!** 🚀
 
 ---
 
-## 🎅 Ready?
+## ❄️ Ready?
 
 When you are, just say **"Let's build!"**
 

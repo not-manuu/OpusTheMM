@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Connection Test
+ * ❄️ Frostbyte - Connection Test
  *
  * Tests that all services initialize correctly
  */

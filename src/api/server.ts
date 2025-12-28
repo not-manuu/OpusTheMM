@@ -77,7 +77,7 @@ export class ApiServer {
 
     this.app.get('/', (_req, res) => {
       res.json({
-        name: "Santa's Tokenomics Bot API",
+        name: "Frostbyte API",
         version: '1.0.0',
         status: 'operational',
         endpoints: {

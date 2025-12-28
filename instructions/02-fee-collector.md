@@ -15,7 +15,7 @@ BUILD: src/modules/feeCollector.ts
 CONTEXT:
 On pump.fun, creators earn 0.05% of all trading volume for their token. These fees accumulate in the bonding curve and need to be claimed.
 
-**🎅 Santa collects fees and distributes to the 4 Reindeer:**
+**🎅 Frostbyte fee distribution:**
 - 25% → Reindeer 1 (Volume Creation)
 - 25% → Reindeer 2 (Buyback & Burn)
 - 25% → Reindeer 3 (Holder Airdrops)
@@ -167,7 +167,7 @@ DISTRIBUTION LOGIC:
 async function distributeFees(totalAmount: number): Promise<void> {
   const { distributionPercentages } = this.config;
 
-  // 🎅 Santa distributes to the 4 Reindeer (25% each)
+  // ❄️ Frostbyte distribution (25% each)
   const amounts = {
     volume: totalAmount * (distributionPercentages.volume / 100),      // Reindeer 1
     buyback: totalAmount * (distributionPercentages.buyback / 100),    // Reindeer 2
@@ -184,7 +184,7 @@ async function distributeFees(totalAmount: number): Promise<void> {
   };
 
   try {
-    logger.info('🎅 Santa distributing to the 4 Reindeer...', { totalAmount });
+    logger.info('❄️ Frostbyte distributing fees...', { totalAmount });
 
     // Reindeer 1: Volume Creation (fastest, can fail without affecting others)
     try {

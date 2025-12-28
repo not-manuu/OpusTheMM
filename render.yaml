@@ -1,9 +1,9 @@
-# 🎅 Santa's Tokenomics Bot - Render Deployment Configuration
+# ❄️ Frostbyte - Render Deployment Configuration
 # Deploy as a Background Worker on Render.com
 
 services:
   - type: worker
-    name: santas-tokenomics-bot
+    name: frostbyte
     runtime: node
     plan: starter
     buildCommand: npm install && npm run build

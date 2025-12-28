@@ -1,8 +1,8 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Fee Collector Module
+ * ❄️ Frostbyte - Fee Collector Module
  *
  * Monitors pump.fun bonding curve for creator fees, claims them automatically,
- * and triggers distribution to the 4 Reindeer (25% each)
+ * and triggers distribution to the Frostbyte modules (25% each)
  */
 
 import {
@@ -341,7 +341,7 @@ export class FeeCollector {
       errors: [],
     };
 
-    logger.info('🎅 Santa distributing to the 4 Reindeer...', {
+    logger.info('🎅 Frostbyte distributing fees...', {
       totalAmount,
       volume: amounts.volume,
       buyback: amounts.buyback,

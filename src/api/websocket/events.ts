@@ -66,7 +66,7 @@ class WebSocketManager implements IWebSocketManager {
 
       this.sendToClient(ws, {
         type: 'connected',
-        data: { message: "Connected to Santa's Tokenomics Bot" },
+        data: { message: "Connected to Frostbyte" },
         timestamp: new Date().toISOString(),
       });
     });

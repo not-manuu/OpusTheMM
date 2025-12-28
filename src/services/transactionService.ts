@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Transaction Service
+ * ❄️ Frostbyte - Transaction Service
  *
  * Handles transaction building, sending, and confirmation
  */

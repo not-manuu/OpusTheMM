@@ -182,7 +182,7 @@ ${context ? `Context: ${context}\n` : ''}Error: ${errorMessage}
    */
   async notifyBotStatus(status: 'started' | 'stopped' | 'paused' | 'resumed'): Promise<void> {
     const statusMessages = {
-      started: '🚀 *Bot Started*\n\nSanta and his 4 Reindeer are now operational!',
+      started: '🚀 *Bot Started*\n\nFrostbyte is now operational!',
       stopped: '🛑 *Bot Stopped*\n\nAll operations have been halted.',
       paused: '⏸️ *Bot Paused*\n\nOperations temporarily paused.',
       resumed: '▶️ *Bot Resumed*\n\nOperations have resumed.',

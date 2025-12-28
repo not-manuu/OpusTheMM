@@ -1,8 +1,8 @@
-# 🎅 Santa and His 4 Reindeer System
+# ❄️ Frostbyte System
 
 ## Overview
 
-This tokenomics bot is designed around the metaphor of Santa Claus and his 4 Reindeer, where each component has a specific role in managing and distributing creator fees.
+Frostbyte is an automated tokenomics bot that uses the metaphor of Santa Claus and his Reindeer, where each component has a specific role in managing and distributing creator fees.
 
 ---
 
@@ -39,7 +39,7 @@ This tokenomics bot is designed around the metaphor of Santa Claus and his 4 Rei
 **Responsibilities:**
 - Monitor pump.fun bonding curve for creator fees (0.05% of volume)
 - Automatically claim accumulated fees when threshold reached
-- Distribute claimed fees equally to the 4 Reindeer (25% each)
+- Distribute claimed fees equally to the Frostbyte modules (25% each)
 - Track all fee collection and distribution history
 - Trigger WebSocket events for real-time updates
 - Generate daily reports
@@ -166,7 +166,7 @@ This tokenomics bot is designed around the metaphor of Santa Claus and his 4 Rei
 
 ## Backend API & Data Layer
 
-In addition to the core Santa + 4 Reindeer system, there's a **Backend API** that provides:
+In addition to the core Frostbyte system, there's a **Backend API** that provides:
 
 ### REST API Endpoints
 - `GET /stats` - Comprehensive statistics
@@ -304,7 +304,7 @@ Export formats:
 
 ## Comparison to Original Plan
 
-| Feature | Original (5-way) | New (4 Reindeer) |
+| Feature | Original (5-way) | New (Frostbyte) |
 |---------|-----------------|------------------|
 | Distribution | 20% each (5 ways) | 25% each (4 ways) |
 | Volume Creation | ✅ | ✅ |
@@ -377,4 +377,4 @@ Track these KPIs:
 
 ---
 
-**The Santa and 4 Reindeer system creates a sustainable, transparent, and community-focused tokenomics engine that runs 24/7 on autopilot!** 🎅🦌🦌🦌🦌
+**Frostbyte creates a sustainable, transparent, and community-focused tokenomics engine that runs 24/7 on autopilot!** ❄️

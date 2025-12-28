@@ -1,7 +1,7 @@
 {
-  "name": "santas-tokenomics-bot",
+  "name": "frostbyte",
   "version": "1.0.0",
-  "description": "🎅 Santa and His 4 Reindeer - Automated Tokenomics Bot for pump.fun",
+  "description": "❄️ Frostbyte - Automated Tokenomics Bot for pump.fun",
   "main": "dist/main.js",
   "scripts": {
     "start": "node dist/main.js",

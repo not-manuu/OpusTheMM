@@ -361,7 +361,7 @@
 
 ## 🎅 Configuration Summary
 
-**Santa + 4 Reindeer Setup:**
+**Frostbyte Setup:**
 
 ```
 🎅 SANTA (Fee Collector)

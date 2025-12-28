@@ -13,7 +13,7 @@
 
 ## Architecture
 
-**Project**: Santa's Tokenomics Bot - Automated tokenomics for pump.fun tokens on Solana
+**Project**: Frostbyte - Automated tokenomics for pump.fun tokens on Solana
 
 **Structure**:
 - `src/config/` - Environment validation, constants

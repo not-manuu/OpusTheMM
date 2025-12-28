@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Solana Service
+ * ❄️ Frostbyte - Solana Service
  *
  * Handles Solana RPC connection, wallet management, and blockchain queries
  */

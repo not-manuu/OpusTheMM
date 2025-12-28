@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Environment Configuration
+ * ❄️ Frostbyte - Environment Configuration
  *
  * Loads and validates environment variables
  */

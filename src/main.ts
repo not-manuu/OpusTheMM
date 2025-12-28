@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Main Orchestrator
+ * ❄️ Frostbyte - Main Orchestrator
  *
  * Integrates all modules and manages the bot lifecycle:
  * - Fee collection (Santa)
@@ -37,7 +37,7 @@ class TokenomicsBot {
   private startTime: Date | null = null;
 
   async initialize(): Promise<void> {
-    logger.info('🚀 Initializing Tokenomics Bot...');
+    logger.info('🚀 Initializing Frostbyte...');
 
     try {
       this.solanaService = new SolanaService(
@@ -143,7 +143,7 @@ class TokenomicsBot {
         [burnWallet.publicKey.toString(), BURN_ADDRESS.toString()]
       );
 
-      logger.info('✅ All 4 Reindeer initialized');
+      logger.info('✅ All Frostbyte modules initialized');
 
       this.wireModules();
 
@@ -239,7 +239,7 @@ class TokenomicsBot {
   private printBanner(): void {
     logger.info('');
     logger.info('═══════════════════════════════════════════════════════');
-    logger.info('  🎅 SANTA\'S TOKENOMICS BOT - THE 4 REINDEER');
+    logger.info('  ❄️ FROSTBYTE - Automated Tokenomics');
     logger.info('═══════════════════════════════════════════════════════');
     logger.info('');
     logger.info(`Token: ${config.tokenAddress}`);
@@ -249,7 +249,7 @@ class TokenomicsBot {
     logger.info('🎅 Santa (Fee Collector):');
     logger.info('   Monitors and collects creator fees from pump.fun');
     logger.info('');
-    logger.info('The 4 Reindeer:');
+    logger.info('Frostbyte Modules:');
     logger.info('   🦌 Reindeer 1: 25% → Volume Creation');
     logger.info('   🦌 Reindeer 2: 25% → Buyback & Burn');
     logger.info('   🦌 Reindeer 3: 25% → Holder Airdrops');
@@ -333,7 +333,7 @@ class TokenomicsBot {
 
     logger.info('');
     logger.info('═══════════════════════════════════════════════════════');
-    logger.info('  🎅 SANTA\'S SESSION SUMMARY');
+    logger.info('  ❄️ FROSTBYTE SESSION SUMMARY');
     logger.info('═══════════════════════════════════════════════════════');
     logger.info(`Uptime: ${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s`);
     logger.info('');
@@ -401,7 +401,7 @@ async function main(): Promise<void> {
     await bot.initialize();
     await bot.start();
 
-    logger.info('🎅 Bot is running. Press Ctrl+C to stop.');
+    logger.info('❄️ Frostbyte is running. Press Ctrl+C to stop.');
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Fatal error during startup', { error: errorMsg });

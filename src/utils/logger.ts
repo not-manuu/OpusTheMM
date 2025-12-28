@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Logger Utility
+ * ❄️ Frostbyte - Logger Utility
  *
  * Winston-based logging with console and file outputs
  */

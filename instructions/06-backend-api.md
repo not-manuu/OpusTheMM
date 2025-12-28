@@ -459,7 +459,7 @@ Admin Only:
 
   private formatStatsMessage(stats: any): string {
     return `
-🎅 *Santa's Tokenomics Report*
+❄️ *Frostbyte Report*
 
 *Fee Collection:*
 💰 Total Collected: ${stats.fees.totalCollected.toFixed(4)} SOL

@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - Blockchain Constants
+ * ❄️ Frostbyte - Blockchain Constants
  *
  * Solana program IDs and addresses used throughout the bot
  */
@@ -64,7 +64,7 @@ export const LAMPORTS_PER_SOL = 1_000_000_000;
 // ============================================
 // DISTRIBUTION PERCENTAGES
 // ============================================
-// 🎅 Santa distributes to 4 Reindeer
+// ❄️ Frostbyte distribution percentages
 export const DISTRIBUTION = {
   REINDEER_1_VOLUME: 25,    // Volume Creation
   REINDEER_2_BUYBACK: 25,   // Buyback & Burn

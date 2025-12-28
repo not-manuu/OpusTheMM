@@ -1,5 +1,5 @@
 /**
- * 🎅 Santa's Tokenomics Bot - TypeScript Type Definitions
+ * ❄️ Frostbyte - TypeScript Type Definitions
  *
  * Shared types used throughout the bot
  */

@@ -1,15 +1,15 @@
-# 🎅 Santa's Tokenomics Bot
+# ❄️ Frostbyte
 
 **Automated tokenomics management for pump.fun tokens on Solana**
 
-Santa and his 4 Reindeer work together to create a sustainable, automated tokenomics system that collects creator fees and distributes them across four parallel strategies.
+Frostbyte creates a sustainable, automated tokenomics system that collects creator fees and distributes them across four parallel strategies powered by Santa and his Reindeer.
 
 ---
 
-## 🦌 The 4 Reindeer
+## 🦌 The Frostbyte System
 
-| Reindeer | Role | Share |
-|----------|------|-------|
+| Module | Role | Share |
+|--------|------|-------|
 | 🎅 **Santa** | Collects creator fees from pump.fun | - |
 | ❄️ **Reindeer 1** | Volume Creation - organic trading | 25% |
 | 🔥 **Reindeer 2** | Buyback & Burn - deflationary | 25% |
@@ -171,4 +171,4 @@ MIT
 
 ---
 
-**Built for the pump.fun community** 🎅🦌🦌🦌🦌
+**Built for the pump.fun community** ❄️ Frostbyte

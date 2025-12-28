@@ -1,9 +1,9 @@
-# Tokenomics Bot Build Instructions
+# ❄️ Frostbyte Build Instructions
 
 ## Overview
-This folder contains step-by-step prompts for building a fully automated tokenomics bot for Solana pump.fun tokens.
+This folder contains step-by-step prompts for building Frostbyte - a fully automated tokenomics bot for Solana pump.fun tokens.
 
-**🎅 Santa and His 4 Reindeer System:**
+**❄️ Frostbyte System:**
 - **Santa** (Fee Collector) - Collects fees and orchestrates distribution
 - **Reindeer 1** (Volume Creator) - 25% → Volume Creation
 - **Reindeer 2** (Buyback Burner) - 25% → Buyback & Burn
@@ -128,7 +128,7 @@ Execute these prompts **in order**. Each phase builds on the previous one.
 ---
 
 ## Total Estimated Build Time
-**6-7 hours** for complete implementation (4 Reindeer system + Backend API)
+**6-7 hours** for complete implementation (Frostbyte system + Backend API)
 
 ---
 

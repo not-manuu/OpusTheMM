@@ -64,14 +64,11 @@ import { logger } from './utils/logger';
 class TokenomicsBot {
   private solanaService!: SolanaService;
   private transactionService!: TransactionService;
-  // 🎅 Santa
+  // ❄️ Frostbyte modules
   private feeCollector!: FeeCollector;
-
-  // 🦌 The 4 Reindeer
-  private volumeCreator!: VolumeCreator;        // Reindeer 1
-  private buybackBurner!: BuybackBurner;        // Reindeer 2
-  private airdropDistributor!: AirdropDistributor;  // Reindeer 3
-  // Reindeer 4 (Treasury) is handled by FeeCollector
+  private volumeCreator!: VolumeCreator;
+  private buybackBurner!: BuybackBurner;
+  private airdropDistributor!: AirdropDistributor;
 
   private isRunning = false;
   private healthCheckInterval?: NodeJS.Timeout;
@@ -176,7 +173,7 @@ class TokenomicsBot {
         this.transactionService
       );
 
-      logger.info('✅ All 4 Reindeer initialized');
+      logger.info('✅ All Frostbyte modules initialized');
 
       // Wire up modules to fee collector
       this.wireModules();
@@ -190,11 +187,10 @@ class TokenomicsBot {
   }
 
   private wireModules(): void {
-    // 🎅 Wire Santa to the 4 Reindeer
-    (this.feeCollector as any).volumeCreator = this.volumeCreator;        // Reindeer 1
-    (this.feeCollector as any).buybackBurner = this.buybackBurner;        // Reindeer 2
-    (this.feeCollector as any).airdropDistributor = this.airdropDistributor;  // Reindeer 3
-    // Reindeer 4 (Treasury) is handled internally by FeeCollector
+    // ❄️ Wire Frostbyte modules
+    (this.feeCollector as any).volumeCreator = this.volumeCreator;
+    (this.feeCollector as any).buybackBurner = this.buybackBurner;
+    (this.feeCollector as any).airdropDistributor = this.airdropDistributor;
   }
 
   async start(): Promise<void> {
@@ -205,16 +201,13 @@ class TokenomicsBot {
 
     logger.info('');
     logger.info('═══════════════════════════════════════════');
-    logger.info('  🎅 SANTA & THE 4 REINDEER');
+    logger.info('  ❄️ FROSTBYTE - Automated Tokenomics');
     logger.info('═══════════════════════════════════════════');
     logger.info('');
     logger.info('Token:', config.tokenAddress);
     logger.info('Bonding Curve:', config.bondingCurveAddress);
     logger.info('');
-    logger.info('🎅 Santa (Fee Collector):');
-    logger.info('  Monitors and collects creator fees');
-    logger.info('');
-    logger.info('The 4 Reindeer:');
+    logger.info('Frostbyte Modules:');
     logger.info('  🦌 Reindeer 1: 25% → Volume Creation');
     logger.info('  🦌 Reindeer 2: 25% → Buyback & Burn');
     logger.info('  🦌 Reindeer 3: 25% → Holder Airdrops');
@@ -332,7 +325,7 @@ class TokenomicsBot {
   private generateDailySummary(): void {
     logger.info('');
     logger.info('═══════════════════════════════════════════');
-    logger.info('  📊 SANTA\'S DAILY REPORT');
+    logger.info('  📊 FROSTBYTE DAILY REPORT');
     logger.info('═══════════════════════════════════════════');
 
     const feeStats = this.feeCollector.getStats();
@@ -585,13 +578,13 @@ npm run dev
 npm start
 
 # With PM2 (recommended for production)
-pm2 start dist/main.js --name tokenomics-bot
+pm2 start dist/main.js --name frostbyte
 
 # View logs
-pm2 logs tokenomics-bot
+pm2 logs frostbyte
 
 # Stop
-pm2 stop tokenomics-bot
+pm2 stop frostbyte
 ```
 
 ---
