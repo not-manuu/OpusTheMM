@@ -1,25 +1,18 @@
 /**
  * ❄️ Frostbyte - Fee Collector Module
  *
- * Monitors pump.fun bonding curve for creator fees, claims them automatically,
+ * Claims creator rewards from Pump.fun's new reward system via Pump Portal API,
  * and triggers distribution to the Frostbyte modules (25% each)
  */
 
 import {
-  PublicKey,
-  TransactionInstruction,
   SystemProgram,
   LAMPORTS_PER_SOL,
+  VersionedTransaction,
 } from '@solana/web3.js';
-import { getAssociatedTokenAddress, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import BN from 'bn.js';
 import { SolanaService } from '../services/solanaService';
 import { TransactionService } from '../services/transactionService';
-import {
-  PUMP_FUN_PROGRAM,
-  PUMP_FUN_GLOBAL,
-  PUMP_FUN_EVENT_AUTHORITY,
-} from '../config/constants';
 import { logger } from '../utils/logger';
 import { wsManager } from '../api/websocket/events';
 import {
@@ -33,6 +26,9 @@ import {
   TreasuryStats,
   TreasuryRecord,
 } from '../types';
+
+// Pump Portal API endpoint for claiming creator fees
+const PUMP_PORTAL_API = 'https://pumpportal.fun/api/trade-local';
 
 export class FeeCollector {
   private config: FeeCollectorConfig;
@@ -75,9 +71,9 @@ export class FeeCollector {
 
     this.validateConfig();
 
-    logger.info('🎅 Fee Collector initialized', {
+    logger.info('🎅 Fee Collector initialized (Pump Portal API)', {
       token: this.config.tokenAddress.toString(),
-      bondingCurve: this.config.bondingCurveAddress.toString(),
+      creator: this.config.creatorWallet.publicKey.toString(),
       threshold: this.config.minimumClaimThreshold,
       checkInterval: this.config.checkInterval,
       dryRun: this.config.dryRun,
@@ -126,8 +122,9 @@ export class FeeCollector {
       return;
     }
 
-    logger.info('🚀 Fee collector starting...', {
+    logger.info('🚀 Fee collector starting (Pump Portal API)...', {
       token: this.config.tokenAddress.toString(),
+      creator: this.config.creatorWallet.publicKey.toString(),
       checkInterval: this.config.checkInterval,
     });
 
@@ -164,77 +161,75 @@ export class FeeCollector {
 
   async checkAndClaimFees(): Promise<void> {
     try {
-      const feeBalance = await this.getCreatorFeeBalance();
+      // Get wallet balance before claiming
+      const balanceBefore = await this.solanaService.getSolBalance(
+        this.config.creatorWallet.publicKey
+      );
 
-      logger.debug('Fee balance check', {
-        balance: feeBalance,
-        threshold: this.config.minimumClaimThreshold,
+      logger.debug('Attempting to claim creator rewards via Pump Portal...', {
+        wallet: this.config.creatorWallet.publicKey.toString(),
+        balanceBefore,
       });
 
-      if (feeBalance >= this.config.minimumClaimThreshold) {
-        logger.info('💰 Fee threshold reached, claiming...', { amount: feeBalance });
+      if (this.config.dryRun) {
+        logger.info('[DRY RUN] Would attempt to claim creator rewards');
+        return;
+      }
 
-        if (this.config.dryRun) {
-          logger.info('[DRY RUN] Would claim fees', { amount: feeBalance });
-          await this.distributeFees(feeBalance);
-          return;
-        }
+      // Attempt to claim via Pump Portal API
+      const signature = await this.claimCreatorRewards();
 
-        const signature = await this.claimFees();
+      if (!signature) {
+        logger.debug('No creator rewards to claim or claim failed');
+        return;
+      }
 
-        logger.info('✅ Fees claimed', { signature, amount: feeBalance });
+      // Wait a moment for the transaction to be reflected
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
-        this.stats.totalCollected += feeBalance;
-        this.stats.lastClaimAmount = feeBalance;
+      // Get wallet balance after claiming
+      const balanceAfter = await this.solanaService.getSolBalance(
+        this.config.creatorWallet.publicKey
+      );
+
+      const claimedAmount = balanceAfter - balanceBefore;
+
+      if (claimedAmount > 0) {
+        logger.info('💰 Creator rewards claimed!', {
+          signature,
+          amount: claimedAmount.toFixed(6),
+        });
+
+        this.stats.totalCollected += claimedAmount;
+        this.stats.lastClaimAmount = claimedAmount;
         this.stats.lastClaimTime = new Date();
         this.stats.claimCount++;
         this.lastClaimSignature = signature;
 
         // Broadcast fee collected event to dashboard
-        wsManager.broadcastFeeCollected(feeBalance, signature);
+        wsManager.broadcastFeeCollected(claimedAmount, signature);
 
-        await this.distributeFees(feeBalance);
+        // Distribute the claimed rewards
+        if (claimedAmount >= this.config.minimumClaimThreshold) {
+          await this.distributeFees(claimedAmount);
+        } else {
+          logger.info('Claimed amount below distribution threshold, accumulating...', {
+            claimed: claimedAmount,
+            threshold: this.config.minimumClaimThreshold,
+          });
+        }
+      } else {
+        logger.debug('No rewards were claimed (balance unchanged)');
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Failed to check/claim fees', { error: errorMsg });
-      wsManager.broadcastError('Fee collection failed', { error: errorMsg });
-      throw error;
-    }
-  }
-
-  private async getCreatorFeeBalance(): Promise<number> {
-    try {
-      const connection = this.solanaService.getConnection();
-      const accountInfo = await connection.getAccountInfo(
-        this.config.bondingCurveAddress
-      );
-
-      if (!accountInfo) {
-        throw new Error('Bonding curve account not found');
+      // Don't log as error if it's just "no rewards to claim"
+      if (errorMsg.includes('no rewards') || errorMsg.includes('No fees')) {
+        logger.debug('No creator rewards available to claim');
+      } else {
+        logger.error('Failed to claim creator rewards', { error: errorMsg });
+        wsManager.broadcastError('Creator reward claim failed', { error: errorMsg });
       }
-
-      const data = this.decodeBondingCurve(accountInfo.data);
-      
-      const solBalance = await this.solanaService.getSolBalance(
-        this.config.bondingCurveAddress
-      );
-
-      const realSolReserves = data.realSolReserves.toNumber() / LAMPORTS_PER_SOL;
-      const availableFees = Math.max(0, solBalance - realSolReserves);
-
-      logger.debug('Bonding curve state', {
-        solBalance,
-        realSolReserves,
-        availableFees,
-        complete: data.complete,
-      });
-
-      return availableFees;
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Failed to get creator fee balance', { error: errorMsg });
-      throw error;
     }
   }
 
@@ -271,53 +266,83 @@ export class FeeCollector {
     };
   }
 
-  private async claimFees(): Promise<string> {
+  /**
+   * Claim creator rewards via Pump Portal API
+   * Uses the new Pump.fun creator rewards system
+   */
+  private async claimCreatorRewards(): Promise<string | null> {
     try {
-      const creatorAta = await getAssociatedTokenAddress(
-        this.config.tokenAddress,
-        this.config.creatorWallet.publicKey
-      );
+      logger.debug('Requesting claim transaction from Pump Portal...');
 
-      const instruction = this.buildWithdrawInstruction(creatorAta);
+      // Request unsigned transaction from Pump Portal
+      const response = await fetch(PUMP_PORTAL_API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          publicKey: this.config.creatorWallet.publicKey.toString(),
+          action: 'collectCreatorFee',
+          priorityFee: '0.0001', // Small priority fee for faster confirmation
+          pool: 'pump',
+        }),
+      });
 
-      const transaction = await this.transactionService.buildTransaction(
-        [instruction],
-        this.config.creatorWallet.publicKey
-      );
+      if (!response.ok) {
+        const errorText = await response.text();
+        // Check if it's a "no fees to claim" error
+        if (errorText.includes('no') && (errorText.includes('fee') || errorText.includes('reward'))) {
+          logger.debug('No creator rewards available to claim');
+          return null;
+        }
+        throw new Error(`Pump Portal API error: ${response.status} - ${errorText}`);
+      }
 
-      const signature = await this.transactionService.sendAndConfirm(
-        transaction,
-        [this.config.creatorWallet]
-      );
+      // Get the transaction bytes
+      const txBuffer = await response.arrayBuffer();
 
+      if (txBuffer.byteLength === 0) {
+        logger.debug('Empty response from Pump Portal - no rewards to claim');
+        return null;
+      }
+
+      // Deserialize the versioned transaction
+      const txBytes = new Uint8Array(txBuffer);
+      const transaction = VersionedTransaction.deserialize(txBytes);
+
+      // Sign the transaction
+      transaction.sign([this.config.creatorWallet]);
+
+      // Send the signed transaction
+      const connection = this.solanaService.getConnection();
+      const signature = await connection.sendTransaction(transaction, {
+        skipPreflight: false,
+        preflightCommitment: 'confirmed',
+      });
+
+      logger.debug('Claim transaction sent', { signature });
+
+      // Wait for confirmation
+      const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+
+      if (confirmation.value.err) {
+        throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+      }
+
+      logger.info('✅ Creator rewards claim confirmed', { signature });
       return signature;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Failed to claim fees', { error: errorMsg });
+
+      // Handle specific error cases gracefully
+      if (errorMsg.includes('no') || errorMsg.includes('empty') || errorMsg.includes('0x0')) {
+        logger.debug('No creator rewards to claim at this time');
+        return null;
+      }
+
+      logger.error('Failed to claim creator rewards', { error: errorMsg });
       throw error;
     }
-  }
-
-  private buildWithdrawInstruction(creatorAta: PublicKey): TransactionInstruction {
-    const WITHDRAW_DISCRIMINATOR = Buffer.from([183, 18, 70, 156, 148, 109, 161, 34]);
-
-    const keys = [
-      { pubkey: PUMP_FUN_GLOBAL, isSigner: false, isWritable: false },
-      { pubkey: this.config.bondingCurveAddress, isSigner: false, isWritable: true },
-      { pubkey: this.config.associatedBondingCurve, isSigner: false, isWritable: true },
-      { pubkey: this.config.creatorWallet.publicKey, isSigner: true, isWritable: true },
-      { pubkey: creatorAta, isSigner: false, isWritable: true },
-      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-      { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-      { pubkey: PUMP_FUN_EVENT_AUTHORITY, isSigner: false, isWritable: false },
-      { pubkey: PUMP_FUN_PROGRAM, isSigner: false, isWritable: false },
-    ];
-
-    return new TransactionInstruction({
-      keys,
-      programId: PUMP_FUN_PROGRAM,
-      data: WITHDRAW_DISCRIMINATOR,
-    });
   }
 
   private async distributeFees(totalAmount: number): Promise<void> {
