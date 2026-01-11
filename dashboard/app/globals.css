@@ -1,62 +1,103 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   CLAUDE-THEMED DESIGN SYSTEM
+   Warm, humanistic terminal aesthetic
+   ============================================ */
+
 :root {
-  --bg-color: #0d0d15;
-  --card-bg: #1a1a2e;
-  --text-main: #ffffff;
-  --text-muted: #8b9bb4;
-  --accent-red: #ff3333;
-  --accent-green: #00e676;
-  --accent-gold: #ffcc00;
-  --accent-blue: #3498db;
-  --accent-orange: #ff9f43;
-  --accent-purple: #a78bfa;
-  --border-width: 4px;
+  /* Core Claude Colors */
+  --claude-coral: #D97706;
+  --claude-coral-bright: #EA580C;
+  --claude-coral-dim: #B45309;
+  --claude-amber: #F59E0B;
+  --claude-amber-bright: #FBBF24;
+
+  /* Warm Dark Backgrounds */
+  --bg-primary: #0C0A09;
+  --bg-secondary: #1C1917;
+  --bg-tertiary: #292524;
+  --bg-elevated: #44403C;
+
+  /* Text Colors */
+  --text-primary: #FAFAF9;
+  --text-secondary: #A8A29E;
+  --text-muted: #78716C;
+  --text-dim: #57534E;
+
+  /* Semantic Colors */
+  --success: #84CC16;
+  --success-dim: #65A30D;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --error-dim: #DC2626;
+  --info: #22D3EE;
+
+  /* Thought Category Colors */
+  --thought-observing: #22D3EE;
+  --thought-thinking: #D97706;
+  --thought-analyzing: #A78BFA;
+  --thought-deciding: #84CC16;
+  --thought-emotions: #F472B6;
+  --thought-idea: #FBBF24;
+
+  /* Terminal */
+  --terminal-bg: #0C0A09;
+  --terminal-border: #292524;
+  --terminal-glow: rgba(217, 119, 6, 0.15);
+
+  /* Spacing */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
 }
 
+/* Base styles */
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  font-family: 'VT323', monospace;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
   min-height: 100vh;
 }
 
-/* Pixel Art Font Classes */
-.font-pixel-headline {
-  font-family: 'Press Start 2P', cursive;
+/* Monospace for terminal/code */
+.font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-.font-pixel-body {
-  font-family: 'VT323', monospace;
-}
-
-/* Custom scrollbar */
+/* Custom scrollbar - Claude themed */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--card-bg);
+  background: var(--bg-secondary);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
+  background: var(--bg-elevated);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: var(--text-muted);
 }
 
-/* Activity feed animation */
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-4px);
   }
   to {
     opacity: 1;
@@ -64,129 +105,385 @@ body {
   }
 }
 
-.activity-item {
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px var(--claude-coral), 0 0 8px rgba(217, 119, 6, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 8px var(--claude-coral), 0 0 16px rgba(217, 119, 6, 0.5);
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes thinking-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes scroll-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Pulse animation for live indicator */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 5px var(--accent-green);
-  }
-  50% {
-    opacity: 0.5;
-    text-shadow: none;
-  }
+.animate-slide-in {
+  animation: slideIn 0.2s ease-out;
 }
 
-.pulse {
-  animation: pulse 2s infinite;
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Blink animation for terminal cursor */
-@keyframes blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
+.animate-blink {
+  animation: blink 1s step-end infinite;
 }
 
-.blink {
-  animation: blink 1s infinite;
+.animate-thinking {
+  animation: thinking-pulse 1.5s ease-in-out infinite;
 }
 
-/* Pixel Card Styles */
-.pixel-card {
-  background: var(--card-bg);
-  border: var(--border-width) solid var(--text-muted);
+.animate-scroll-fade {
+  animation: scroll-fade 0.3s ease-out;
+}
+
+/* ============================================
+   CARD STYLES
+   ============================================ */
+
+.claude-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  position: relative;
-  transition: transform 0.2s, box-shadow 0.2s;
-  image-rendering: pixelated;
+  transition: all 0.2s ease;
 }
 
-.pixel-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 6px 6px 0px var(--accent-red);
-  border-color: var(--text-main);
+.claude-card:hover {
+  border-color: var(--bg-elevated);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
 }
 
-/* Pixel Header */
-.pixel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.claude-card-glow {
+  background: var(--bg-secondary);
+  border: 1px solid var(--claude-coral-dim);
+  border-radius: var(--radius-lg);
   padding: 20px;
-  border: var(--border-width) solid var(--text-main);
-  background: var(--card-bg);
-  box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+  box-shadow: 0 0 20px var(--terminal-glow);
 }
 
-/* Terminal Styles */
-.terminal {
-  background: #000;
-  border: 4px solid var(--accent-green);
-  padding: 20px;
-  font-family: 'VT323', monospace;
-  box-shadow: inset 0 0 20px rgba(0, 230, 118, 0.2);
+/* ============================================
+   TERMINAL STYLES
+   ============================================ */
+
+.terminal-window {
+  background: var(--terminal-bg);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .terminal-header {
-  color: var(--accent-green);
-  border-bottom: 2px solid var(--accent-green);
-  padding-bottom: 10px;
-  margin-bottom: 10px;
-}
-
-/* Fee Distribution Bar */
-.progress-bar-container {
-  height: 40px;
-  width: 100%;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--terminal-border);
+  padding: 12px 16px;
   display: flex;
-  border: 4px solid #fff;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.bar-segment {
-  height: 100%;
+.terminal-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-dot.red { background: #EF4444; }
+.terminal-dot.yellow { background: #F59E0B; }
+.terminal-dot.green { background: #84CC16; }
+
+.terminal-content {
+  padding: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.terminal-line {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 2px;
+  animation: scroll-fade 0.2s ease-out;
+}
+
+.terminal-timestamp {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.terminal-tag {
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.terminal-tag.observing { color: var(--thought-observing); }
+.terminal-tag.thinking { color: var(--thought-thinking); }
+.terminal-tag.analyzing { color: var(--thought-analyzing); }
+.terminal-tag.deciding { color: var(--thought-deciding); }
+.terminal-tag.emotions { color: var(--thought-emotions); }
+.terminal-tag.idea { color: var(--thought-idea); }
+.terminal-tag.trade { color: var(--success); }
+.terminal-tag.error { color: var(--error); }
+
+.terminal-message {
+  color: var(--text-secondary);
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: var(--claude-coral);
+  margin-left: 2px;
+  animation: blink 1s step-end infinite;
+}
+
+/* ============================================
+   MIND STREAM STYLES
+   ============================================ */
+
+.mind-stream {
+  background: var(--bg-secondary);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.mind-stream-header {
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--terminal-border);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mind-stream-content {
+  padding: 16px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.thought-card {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-left: 3px solid;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.thought-card.idea { border-color: var(--thought-idea); }
+.thought-card.thinking { border-color: var(--thought-thinking); }
+.thought-card.observing { border-color: var(--thought-observing); }
+.thought-card.deciding { border-color: var(--thought-deciding); }
+.thought-card.emotions { border-color: var(--thought-emotions); }
+
+.thought-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.5rem;
-  color: #000;
-  cursor: pointer;
-  transition: opacity 0.2s;
+  font-size: 12px;
+  flex-shrink: 0;
 }
 
-.bar-segment:hover {
-  opacity: 0.8;
+.thought-icon.idea { background: rgba(251, 191, 36, 0.2); }
+.thought-icon.thinking { background: rgba(217, 119, 6, 0.2); }
+.thought-icon.observing { background: rgba(34, 211, 238, 0.2); }
+.thought-icon.deciding { background: rgba(132, 204, 22, 0.2); }
+.thought-icon.emotions { background: rgba(244, 114, 182, 0.2); }
+
+/* ============================================
+   STATUS INDICATORS
+   ============================================ */
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-/* Snow Canvas */
-#snowCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
+.status-indicator.online {
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
 }
 
-/* Color utility classes */
-.text-accent-red { color: var(--accent-red); }
-.text-accent-green { color: var(--accent-green); }
-.text-accent-gold { color: var(--accent-gold); }
-.text-accent-blue { color: var(--accent-blue); }
-.text-accent-orange { color: var(--accent-orange); }
-.text-accent-purple { color: var(--accent-purple); }
+.status-indicator.offline {
+  background: var(--error);
+}
+
+.status-indicator.thinking {
+  background: var(--claude-coral);
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.streaming {
+  background: rgba(217, 119, 6, 0.2);
+  color: var(--claude-coral);
+  border: 1px solid var(--claude-coral-dim);
+}
+
+.status-badge.idle {
+  background: rgba(120, 113, 108, 0.2);
+  color: var(--text-muted);
+  border: 1px solid var(--text-dim);
+}
+
+/* ============================================
+   ALLOCATION BAR
+   ============================================ */
+
+.allocation-bar {
+  display: flex;
+  height: 32px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--terminal-border);
+}
+
+.allocation-segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--bg-primary);
+  transition: all 0.3s ease;
+}
+
+.allocation-segment.volume { background: var(--info); }
+.allocation-segment.buyback { background: var(--claude-coral); }
+.allocation-segment.airdrop { background: var(--success); }
+.allocation-segment.treasury { background: var(--thought-idea); }
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-claude-coral { color: var(--claude-coral); }
+.text-claude-amber { color: var(--claude-amber); }
+.text-success { color: var(--success); }
+.text-error { color: var(--error); }
+.text-warning { color: var(--warning); }
+.text-info { color: var(--info); }
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
 .text-muted { color: var(--text-muted); }
 
-.bg-card { background: var(--card-bg); }
-.bg-main { background: var(--bg-color); }
+.bg-primary { background: var(--bg-primary); }
+.bg-secondary { background: var(--bg-secondary); }
+.bg-tertiary { background: var(--bg-tertiary); }
+.bg-elevated { background: var(--bg-elevated); }
 
-.border-muted { border-color: var(--text-muted); }
-.border-accent-green { border-color: var(--accent-green); }
+.border-subtle { border-color: var(--terminal-border); }
+.border-claude { border-color: var(--claude-coral-dim); }
+
+/* Glow effects */
+.glow-coral {
+  box-shadow: 0 0 20px var(--terminal-glow);
+}
+
+.glow-success {
+  box-shadow: 0 0 12px rgba(132, 204, 22, 0.3);
+}
+
+/* ============================================
+   LEGACY SUPPORT (pixel styles)
+   ============================================ */
+
+.pixel-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.pixel-card:hover {
+  border-color: var(--bg-elevated);
+}
+
+.font-pixel-headline {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+.font-pixel-body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Legacy color classes */
+.text-accent-red { color: var(--error); }
+.text-accent-green { color: var(--success); }
+.text-accent-gold { color: var(--thought-idea); }
+.text-accent-blue { color: var(--info); }
+.text-accent-orange { color: var(--claude-coral); }
+.text-accent-purple { color: var(--thought-analyzing); }
+
+.bg-accent-blue { background: var(--info); }
+.bg-accent-orange { background: var(--claude-coral); }
+.bg-accent-green { background: var(--success); }
+.bg-accent-gold { background: var(--thought-idea); }

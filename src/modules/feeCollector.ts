@@ -26,6 +26,7 @@ import {
   TreasuryStats,
   TreasuryRecord,
 } from '../types';
+import { DecisionEngine, AllocationPercentages } from '../ai';
 
 // Pump Portal API endpoint for claiming creator fees
 const PUMP_PORTAL_API = 'https://pumpportal.fun/api/trade-local';
@@ -43,6 +44,7 @@ export class FeeCollector {
   private volumeCreator?: IVolumeCreator;
   private buybackBurner?: IBuybackBurner;
   private airdropDistributor?: IAirdropDistributor;
+  private decisionEngine?: DecisionEngine;
 
   constructor(
     config: FeeCollectorConfig,
@@ -114,6 +116,14 @@ export class FeeCollector {
   setAirdropDistributor(airdropDistributor: IAirdropDistributor): void {
     this.airdropDistributor = airdropDistributor;
     logger.debug('Airdrop distributor set');
+  }
+
+  /**
+   * Set the AI Decision Engine for dynamic fee allocation
+   */
+  setDecisionEngine(decisionEngine: DecisionEngine): void {
+    this.decisionEngine = decisionEngine;
+    logger.info('🧠 AI Decision Engine connected to Fee Collector');
   }
 
   async start(): Promise<void> {
@@ -290,8 +300,11 @@ export class FeeCollector {
 
       if (!response.ok) {
         const errorText = await response.text();
-        // Check if it's a "no fees to claim" error
-        if (errorText.includes('no') && (errorText.includes('fee') || errorText.includes('reward'))) {
+        // Handle "no rewards to claim" - Pump Portal returns 400 when there's nothing to claim
+        if (
+          response.status === 400 ||
+          (errorText.includes('no') && (errorText.includes('fee') || errorText.includes('reward')))
+        ) {
           logger.debug('No creator rewards available to claim');
           return null;
         }
@@ -346,13 +359,30 @@ export class FeeCollector {
   }
 
   private async distributeFees(totalAmount: number): Promise<void> {
-    const { distributionPercentages } = this.config;
+    // Get allocation percentages - either from AI or default config
+    let allocation: AllocationPercentages;
+    let aiDecided = false;
+
+    if (this.decisionEngine && this.decisionEngine.isEnabled()) {
+      try {
+        logger.info('🧠 Requesting AI decision for fee allocation...');
+        allocation = await this.decisionEngine.decide(totalAmount);
+        aiDecided = true;
+        logger.info('🧠 AI decided allocation', { allocation });
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        logger.warn('AI decision failed, using default allocation', { error: errorMsg });
+        allocation = this.config.distributionPercentages;
+      }
+    } else {
+      allocation = this.config.distributionPercentages;
+    }
 
     const amounts = {
-      volume: totalAmount * (distributionPercentages.volume / 100),
-      buyback: totalAmount * (distributionPercentages.buyback / 100),
-      airdrop: totalAmount * (distributionPercentages.airdrop / 100),
-      treasury: totalAmount * (distributionPercentages.treasury / 100),
+      volume: totalAmount * (allocation.volume / 100),
+      buyback: totalAmount * (allocation.buyback / 100),
+      airdrop: totalAmount * (allocation.airdrop / 100),
+      treasury: totalAmount * (allocation.treasury / 100),
     };
 
     const record: DistributionRecord = {
@@ -372,6 +402,8 @@ export class FeeCollector {
       buyback: amounts.buyback,
       airdrop: amounts.airdrop,
       treasury: amounts.treasury,
+      aiDecided,
+      allocation,
     });
 
     try {
@@ -500,6 +532,20 @@ export class FeeCollector {
 
   isActive(): boolean {
     return this.isRunning;
+  }
+
+  /**
+   * Get the AI Decision Engine (for API/dashboard access)
+   */
+  getDecisionEngine(): DecisionEngine | undefined {
+    return this.decisionEngine;
+  }
+
+  /**
+   * Check if AI-powered allocation is active
+   */
+  isAIPowered(): boolean {
+    return this.decisionEngine?.isEnabled() ?? false;
   }
 
   async getBondingCurveStatus(): Promise<{

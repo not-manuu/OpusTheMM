@@ -96,6 +96,80 @@ export interface WalletData {
   };
 }
 
+// AI-related types
+export type ThoughtSectionName =
+  | 'market_analysis'
+  | 'sentiment'
+  | 'risk_assessment'
+  | 'strategy'
+  | 'allocation';
+
+export interface ThoughtChunk {
+  section: ThoughtSectionName;
+  content: string;
+  isComplete: boolean;
+  timestamp: string;
+}
+
+export interface AllocationPercentages {
+  volume: number;
+  buyback: number;
+  airdrop: number;
+  treasury: number;
+}
+
+export interface AIReasoning {
+  sentiment: 'bullish' | 'bearish' | 'neutral' | 'volatile';
+  marketCondition: string;
+  riskLevel: 'low' | 'medium' | 'high';
+  keyFactors: string[];
+  strategy: string;
+}
+
+export interface AIDecision {
+  allocation: AllocationPercentages;
+  reasoning: AIReasoning;
+  confidence: number;
+  priority: 'volume' | 'stability' | 'growth' | 'defense';
+  nextEvaluationMinutes: number;
+}
+
+export interface MarketSnapshot {
+  timestamp: string;
+  price: {
+    current: number;
+    change1h: number;
+    change24h: number;
+    high24h: number;
+    low24h: number;
+  };
+  volume: {
+    volume24h: number;
+    buyVolume24h: number;
+    sellVolume24h: number;
+    buySellRatio: number;
+  };
+  holders: {
+    total: number;
+    change24h: number;
+  };
+  bondingCurve: {
+    progressPercent: number;
+    isComplete: boolean;
+    virtualSolReserves: number;
+    virtualTokenReserves: number;
+  };
+}
+
+export interface AIStats {
+  enabled: boolean;
+  totalDecisions: number;
+  lastDecisionTime: string | null;
+  lastSentiment: string | null;
+  lastConfidence: number | null;
+  isProcessing: boolean;
+}
+
 // WebSocket event types
 export type WSEventType =
   | 'fee_collected'
@@ -105,7 +179,18 @@ export type WSEventType =
   | 'treasury'
   | 'error'
   | 'stats'
-  | 'connected';
+  | 'connected'
+  // AI-related events
+  | 'ai_thinking_start'
+  | 'ai_thinking_section'
+  | 'ai_thinking_chunk'
+  | 'ai_thinking_complete'
+  | 'ai_thinking_error'
+  | 'ai_decision'
+  | 'market_data'
+  // Consciousness stream events
+  | 'consciousness'
+  | 'mind_stream';
 
 export interface WSMessage {
   type: WSEventType;
@@ -119,4 +204,36 @@ export interface ActivityEvent {
   message: string;
   timestamp: Date;
   data?: Record<string, unknown>;
+}
+
+// ============================================
+// CONSCIOUSNESS STREAM TYPES
+// ============================================
+
+export type ConsciousnessType =
+  | 'OBSERVING'
+  | 'THINKING'
+  | 'ANALYZING'
+  | 'DECIDING'
+  | 'EMOTIONS'
+  | 'IDEA'
+  | 'TRADE'
+  | 'SYSTEM';
+
+export interface ConsciousnessThought {
+  id: string;
+  type: ConsciousnessType;
+  message: string;
+  timestamp: Date;
+  intensity?: number;
+  metadata?: Record<string, unknown>;
+}
+
+export type MindStreamType = 'IDEA' | 'THOUGHT' | 'OBSERVATION';
+
+export interface MindStreamThought {
+  id: string;
+  type: MindStreamType;
+  content: string;
+  timestamp: Date;
 }

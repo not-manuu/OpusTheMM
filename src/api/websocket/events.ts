@@ -6,6 +6,14 @@
 
 import { Server as WebSocketServer, WebSocket } from 'ws';
 import { logger } from '../../utils/logger';
+import {
+  AIDecision,
+  ThoughtChunk,
+  MarketSnapshot,
+  ThoughtSectionName,
+  ConsciousnessThought,
+  MindStreamThought,
+} from '../../ai/types';
 
 export interface WSMessage {
   type:
@@ -16,7 +24,18 @@ export interface WSMessage {
     | 'treasury'
     | 'error'
     | 'stats'
-    | 'connected';
+    | 'connected'
+    // AI-related events
+    | 'ai_thinking_start'
+    | 'ai_thinking_section'
+    | 'ai_thinking_chunk'
+    | 'ai_thinking_complete'
+    | 'ai_thinking_error'
+    | 'ai_decision'
+    | 'market_data'
+    // Consciousness stream events
+    | 'consciousness'
+    | 'mind_stream';
   data: Record<string, unknown>;
   timestamp: string;
 }
@@ -32,6 +51,17 @@ export interface IWebSocketManager {
   broadcastError(message: string, details?: Record<string, unknown>): void;
   broadcastStats(stats: Record<string, unknown>): void;
   getClientCount(): number;
+  // AI-related broadcasts
+  broadcastThinkingStart(): void;
+  broadcastThinkingSection(section: ThoughtSectionName): void;
+  broadcastThinkingChunk(chunk: ThoughtChunk): void;
+  broadcastThinkingComplete(decision: AIDecision): void;
+  broadcastThinkingError(error: string): void;
+  broadcastAIDecision(decision: AIDecision): void;
+  broadcastMarketData(data: MarketSnapshot): void;
+  // Consciousness stream broadcasts
+  broadcastConsciousness(thought: ConsciousnessThought): void;
+  broadcastMindStream(thought: MindStreamThought): void;
 }
 
 class WebSocketManager implements IWebSocketManager {
@@ -163,6 +193,141 @@ class WebSocketManager implements IWebSocketManager {
 
   getClientCount(): number {
     return this.clients.size;
+  }
+
+  // ============================================
+  // AI-RELATED BROADCASTS
+  // ============================================
+
+  /**
+   * Notify clients that AI analysis has started
+   */
+  broadcastThinkingStart(): void {
+    this.broadcast({
+      type: 'ai_thinking_start',
+      data: {
+        message: 'AI analysis starting...',
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Notify clients of current thinking section
+   */
+  broadcastThinkingSection(section: ThoughtSectionName): void {
+    this.broadcast({
+      type: 'ai_thinking_section',
+      data: { section },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Stream a thought chunk to clients
+   */
+  broadcastThinkingChunk(chunk: ThoughtChunk): void {
+    this.broadcast({
+      type: 'ai_thinking_chunk',
+      data: {
+        section: chunk.section,
+        content: chunk.content,
+        isComplete: chunk.isComplete,
+        chunkTimestamp: chunk.timestamp.toISOString(),
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Notify clients that AI thinking is complete
+   */
+  broadcastThinkingComplete(decision: AIDecision): void {
+    this.broadcast({
+      type: 'ai_thinking_complete',
+      data: {
+        decision,
+        completedAt: new Date().toISOString(),
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Notify clients of AI error
+   */
+  broadcastThinkingError(error: string): void {
+    this.broadcast({
+      type: 'ai_thinking_error',
+      data: {
+        error,
+        message: 'AI analysis failed, using default allocation',
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Broadcast final AI decision
+   */
+  broadcastAIDecision(decision: AIDecision): void {
+    this.broadcast({
+      type: 'ai_decision',
+      data: { ...decision },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Broadcast market data snapshot
+   */
+  broadcastMarketData(data: MarketSnapshot): void {
+    this.broadcast({
+      type: 'market_data',
+      data: {
+        ...data,
+        timestamp: data.timestamp.toISOString(),
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // ============================================
+  // CONSCIOUSNESS STREAM BROADCASTS
+  // ============================================
+
+  /**
+   * Broadcast a consciousness thought (terminal stream)
+   */
+  broadcastConsciousness(thought: ConsciousnessThought): void {
+    this.broadcast({
+      type: 'consciousness',
+      data: {
+        id: thought.id,
+        type: thought.type,
+        message: thought.message,
+        timestamp: thought.timestamp.toISOString(),
+        intensity: thought.intensity,
+        metadata: thought.metadata,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
+   * Broadcast a mind stream thought (categorized display)
+   */
+  broadcastMindStream(thought: MindStreamThought): void {
+    this.broadcast({
+      type: 'mind_stream',
+      data: {
+        id: thought.id,
+        type: thought.type,
+        content: thought.content,
+        timestamp: thought.timestamp.toISOString(),
+      },
+      timestamp: new Date().toISOString(),
+    });
   }
 }
 

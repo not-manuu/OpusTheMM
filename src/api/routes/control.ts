@@ -11,6 +11,17 @@ import { logger } from '../../utils/logger';
 
 const router = Router();
 
+// Store reference to decision engine for testing
+let testDecisionEngine: {
+  forceDecision: (amount: number) => Promise<unknown>;
+  isEnabled: () => boolean;
+  isBusy: () => boolean;
+} | null = null;
+
+export function setTestDecisionEngine(engine: typeof testDecisionEngine): void {
+  testDecisionEngine = engine;
+}
+
 router.use(strictRateLimiter);
 
 router.post('/pause', async (_req: Request, res: Response) => {
@@ -79,6 +90,59 @@ router.post('/emergency-stop', async (_req: Request, res: Response) => {
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Failed to execute emergency stop', { error: errorMsg });
+    res.status(500).json({
+      success: false,
+      error: errorMsg,
+    });
+  }
+});
+
+/**
+ * Test AI Analysis - Triggers the AI brain to analyze and show consciousness stream
+ * POST /api/control/test-ai
+ */
+router.post('/test-ai', async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!testDecisionEngine) {
+      res.status(503).json({
+        success: false,
+        error: 'AI Decision Engine not available',
+      });
+      return;
+    }
+
+    if (!testDecisionEngine.isEnabled()) {
+      res.status(400).json({
+        success: false,
+        error: 'AI Decision Engine is disabled. Check ANTHROPIC_API_KEY in .env',
+      });
+      return;
+    }
+
+    if (testDecisionEngine.isBusy()) {
+      res.status(429).json({
+        success: false,
+        error: 'AI is already analyzing. Please wait.',
+      });
+      return;
+    }
+
+    // Use test amount from request or default to 0.1 SOL
+    const testAmount = parseFloat(req.body?.amount) || 0.1;
+
+    logger.info('🧪 Test AI analysis triggered via API', { testAmount });
+
+    // This will trigger the full AI analysis with consciousness stream
+    const decision = await testDecisionEngine.forceDecision(testAmount);
+
+    res.json({
+      success: true,
+      message: 'AI analysis complete - check dashboard for consciousness stream',
+      data: decision,
+    });
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Test AI analysis failed', { error: errorMsg });
     res.status(500).json({
       success: false,
       error: errorMsg,

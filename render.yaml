@@ -1,13 +1,14 @@
-# ❄️ Frostbyte - Render Deployment Configuration
-# Deploy as a Background Worker on Render.com
+# Frostbyte - Render Deployment Configuration
+# Deploy as a Web Service on Render.com (exposes HTTP + WebSocket)
 
 services:
-  - type: worker
-    name: frostbyte
+  - type: web
+    name: frostbyte-api
     runtime: node
     plan: starter
     buildCommand: npm install && npm run build
     startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
@@ -68,4 +69,15 @@ services:
       - key: API_KEY
         sync: false
       - key: ALLOWED_ORIGINS
-        value: "*"
+        sync: false
+      # AI Decision Engine (set in Render dashboard)
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: AI_ENABLED
+        value: "true"
+      - key: AI_MODEL
+        value: "anthropic/claude-3.5-sonnet"
+      - key: AI_MAX_TOKENS
+        value: "4096"
+      - key: AI_MIN_DECISION_INTERVAL
+        value: "60000"

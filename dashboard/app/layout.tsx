@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Frostbyte Dashboard',
-  description: 'Live tracking dashboard for the Frostbyte tokenomics bot',
+  title: 'Opus the Market Maker Dashboard',
+  description: 'Live tracking dashboard for Opus the Market Maker tokenomics bot',
   icons: {
     icon: '/favicon.ico',
   },

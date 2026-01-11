@@ -1,12 +1,12 @@
 /**
- * ❄️ Frostbyte - Main Orchestrator
+ * WhaleMarket - Autonomous Market Maker Engine
  *
  * Integrates all modules and manages the bot lifecycle:
- * - Fee collection (Santa)
- * - Volume creation (Reindeer 1)
- * - Buyback & burn (Reindeer 2)
- * - Airdrop distribution (Reindeer 3)
- * - Treasury transfers (Reindeer 4)
+ * - Fee collection (opus - Decision Brain)
+ * - Volume creation (sonnet - Fast execution)
+ * - Buyback & burn (haiku - Precise burns)
+ * - Airdrop distribution (claude - Distribution)
+ * - Treasury transfers
  */
 
 import { PublicKey } from '@solana/web3.js';
@@ -21,6 +21,10 @@ import { statsService } from './api/services/statsService';
 import { config } from './config/env';
 import { logger } from './utils/logger';
 import { BURN_ADDRESS } from './config/constants';
+import { DecisionEngine } from './ai';
+import { wsManager } from './api/websocket/events';
+import { setTestDecisionEngine } from './api/routes/control';
+import * as ascii from './utils/asciiDisplay';
 
 class TokenomicsBot {
   private solanaService!: SolanaService;
@@ -30,6 +34,7 @@ class TokenomicsBot {
   private buybackBurner!: BuybackBurner;
   private airdropDistributor!: AirdropDistributor;
   private apiServer!: ApiServer;
+  private decisionEngine?: DecisionEngine;
 
   private isRunning = false;
   private healthCheckInterval?: NodeJS.Timeout;
@@ -145,6 +150,85 @@ class TokenomicsBot {
 
       logger.info('✅ All Frostbyte modules initialized');
 
+      // Initialize AI Decision Engine if API key is provided
+      if (config.anthropicApiKey) {
+        this.decisionEngine = new DecisionEngine(
+          tokenAddress,
+          bondingCurveAddress,
+          this.solanaService,
+          {
+            enabled: config.aiEnabled ?? true,
+            anthropicApiKey: config.anthropicApiKey,
+            birdeyeApiKey: config.birdeyeApiKey,
+            minDecisionInterval: config.aiMinDecisionInterval ?? 60000,
+            model: config.aiModel ?? 'claude-sonnet-4-20250514',
+            maxTokens: config.aiMaxTokens ?? 4096,
+          }
+        );
+
+        // Wire up WebSocket callbacks for real-time AI updates
+        this.decisionEngine.setCallbacks({
+          onThinkingStart: () => {
+            wsManager.broadcastThinkingStart();
+            // Terminal ASCII output
+            ascii.displayThinkingSequence('start');
+          },
+          onThinkingSection: (section) => {
+            wsManager.broadcastThinkingSection(section);
+            // Terminal status based on section
+            if (section === 'market_analysis') {
+              ascii.displayThinkingSequence('analyzing');
+            } else if (section === 'decision') {
+              ascii.displayThinkingSequence('deciding');
+            }
+          },
+          onThinkingChunk: (chunk) => wsManager.broadcastThinkingChunk(chunk),
+          onThinkingComplete: (decision) => {
+            wsManager.broadcastThinkingComplete(decision);
+            // Terminal ASCII output
+            ascii.displayThinkingSequence('complete');
+            ascii.displayDecisionSummary({
+              allocations: decision.allocation,
+              confidence: decision.confidence,
+              sentiment: decision.reasoning.sentiment,
+              reasoning: decision.reasoning.decision,
+            });
+          },
+          onThinkingError: (error) => wsManager.broadcastThinkingError(error),
+          onDecision: (decision) => wsManager.broadcastAIDecision(decision),
+          onMarketData: (data) => {
+            wsManager.broadcastMarketData(data);
+            // Terminal status bar
+            ascii.displayStatusBar(
+              config.aiModel ?? 'opus-4',
+              data.price?.current?.toFixed(6) ?? '0',
+              config.dryRun ? 'DRY RUN' : 'LIVE'
+            );
+          },
+          // Consciousness stream callbacks
+          onConsciousness: (thought) => {
+            wsManager.broadcastConsciousness(thought);
+            // Terminal thought output
+            ascii.displayThought(thought.type, thought.message);
+          },
+          onMindStream: (thought) => {
+            wsManager.broadcastMindStream(thought);
+            // Terminal thinking box for all mind stream thoughts
+            ascii.displayThinkingBox(thought.content);
+          },
+        });
+
+        // Wire up test endpoint for AI
+        setTestDecisionEngine(this.decisionEngine);
+
+        logger.info('✅ AI Decision Engine initialized', {
+          model: config.aiModel ?? 'claude-sonnet-4-20250514',
+          enabled: config.aiEnabled ?? true,
+        });
+      } else {
+        logger.info('ℹ️ AI Decision Engine disabled (no ANTHROPIC_API_KEY)');
+      }
+
       this.wireModules();
 
       logger.info('✅ Modules wired to fee collector');
@@ -171,6 +255,11 @@ class TokenomicsBot {
     this.feeCollector.setVolumeCreator(this.volumeCreator);
     this.feeCollector.setBuybackBurner(this.buybackBurner);
     this.feeCollector.setAirdropDistributor(this.airdropDistributor);
+
+    // Connect AI Decision Engine if available
+    if (this.decisionEngine) {
+      this.feeCollector.setDecisionEngine(this.decisionEngine);
+    }
   }
 
   async start(): Promise<void> {
@@ -237,27 +326,16 @@ class TokenomicsBot {
   }
 
   private printBanner(): void {
-    logger.info('');
-    logger.info('═══════════════════════════════════════════════════════');
-    logger.info('  ❄️ FROSTBYTE - Automated Tokenomics');
-    logger.info('═══════════════════════════════════════════════════════');
-    logger.info('');
-    logger.info(`Token: ${config.tokenAddress}`);
-    logger.info(`Bonding Curve: ${config.bondingCurveAddress || 'Not set'}`);
-    logger.info(`Dry Run: ${config.dryRun}`);
-    logger.info('');
-    logger.info('🎅 Santa (Fee Collector):');
-    logger.info('   Monitors and collects creator fees from pump.fun');
-    logger.info('');
-    logger.info('Frostbyte Modules:');
-    logger.info('   🦌 Reindeer 1: 25% → Volume Creation');
-    logger.info('   🦌 Reindeer 2: 25% → Buyback & Burn');
-    logger.info('   🦌 Reindeer 3: 25% → Holder Airdrops');
-    logger.info('   🦌 Reindeer 4: 25% → Treasury');
-    logger.info('');
+    // Display the big ASCII OpenCode banner
+    ascii.displayStartupBanner({
+      model: config.aiModel ?? 'opus-4',
+      token: config.tokenAddress,
+      bondingCurve: config.bondingCurveAddress || 'Not set',
+      dryRun: config.dryRun,
+    });
+
+    // Log additional info for structured logging
     logger.info(`API Server: http://localhost:${config.apiPort}`);
-    logger.info('═══════════════════════════════════════════════════════');
-    logger.info('');
   }
 
   private startHealthMonitoring(): void {
@@ -307,17 +385,20 @@ class TokenomicsBot {
     const volumeStats = this.volumeCreator.getStats();
     const burnStats = this.buybackBurner.getStats();
     const airdropStats = this.airdropDistributor.getStats();
+    const aiStats = this.decisionEngine?.getStats();
 
-    logger.info('');
-    logger.info('═══════════════════════════════════════════');
-    logger.info('  📊 HOURLY STATUS REPORT');
-    logger.info('═══════════════════════════════════════════');
-    logger.info(`🎅 Fees Collected: ${feeStats.totalCollected.toFixed(6)} SOL (${feeStats.claimCount} claims)`);
-    logger.info(`🦌 Volume Created: ${volumeStats.totalVolume.toFixed(6)} SOL (${volumeStats.successfulTrades}/${volumeStats.tradeCount} trades)`);
-    logger.info(`🔥 Tokens Burned: ${burnStats.totalBurned.toLocaleString()} (${burnStats.totalSolSpent.toFixed(6)} SOL)`);
-    logger.info(`🎁 Airdrops: ${airdropStats.totalDistributed.toFixed(6)} SOL to ${airdropStats.uniqueRecipients.size} holders`);
-    logger.info('═══════════════════════════════════════════');
-    logger.info('');
+    ascii.separator();
+    console.log('\x1b[1m   📊 HOURLY STATUS REPORT\x1b[0m');
+    ascii.separator();
+    console.log(`   \x1b[36m⚡ sonnet\x1b[0m  │ Volume: ${volumeStats.totalVolume.toFixed(6)} SOL (${volumeStats.successfulTrades}/${volumeStats.tradeCount} trades)`);
+    console.log(`   \x1b[31m🔥 haiku\x1b[0m   │ Burned: ${burnStats.totalBurned.toLocaleString()} tokens (${burnStats.totalSolSpent.toFixed(6)} SOL)`);
+    console.log(`   \x1b[35m🎁 claude\x1b[0m  │ Airdrops: ${airdropStats.totalDistributed.toFixed(6)} SOL to ${airdropStats.uniqueRecipients.size} holders`);
+    console.log(`   \x1b[33m💰 treasury\x1b[0m│ Fees: ${feeStats.totalCollected.toFixed(6)} SOL (${feeStats.claimCount} claims)`);
+    if (aiStats) {
+      console.log(`   \x1b[32m🧠 opus\x1b[0m    │ Decisions: ${aiStats.totalDecisions} (${aiStats.lastSentiment || 'N/A'}, ${aiStats.lastConfidence ?? 'N/A'}% confidence)`);
+    }
+    ascii.separator();
+    console.log('');
   }
 
   private generateShutdownSummary(): void {
@@ -326,37 +407,54 @@ class TokenomicsBot {
     const burnStats = this.buybackBurner.getStats();
     const airdropStats = this.airdropDistributor.getStats();
     const treasuryStats = this.feeCollector.getTreasuryStats();
+    const aiStats = this.decisionEngine?.getStats();
 
     const uptime = this.startTime
       ? Math.floor((Date.now() - this.startTime.getTime()) / 1000)
       : 0;
 
-    logger.info('');
-    logger.info('═══════════════════════════════════════════════════════');
-    logger.info('  ❄️ FROSTBYTE SESSION SUMMARY');
-    logger.info('═══════════════════════════════════════════════════════');
-    logger.info(`Uptime: ${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s`);
-    logger.info('');
-    logger.info('🎅 Fee Collection:');
-    logger.info(`   Total Collected: ${feeStats.totalCollected.toFixed(6)} SOL`);
-    logger.info(`   Claim Count: ${feeStats.claimCount}`);
-    logger.info('');
-    logger.info('🦌 Reindeer 1 (Volume):');
-    logger.info(`   Total Volume: ${volumeStats.totalVolume.toFixed(6)} SOL`);
-    logger.info(`   Trades: ${volumeStats.successfulTrades}/${volumeStats.tradeCount}`);
-    logger.info('');
-    logger.info('🦌 Reindeer 2 (Buyback & Burn):');
-    logger.info(`   Tokens Burned: ${burnStats.totalBurned.toLocaleString()}`);
-    logger.info(`   SOL Spent: ${burnStats.totalSolSpent.toFixed(6)}`);
-    logger.info('');
-    logger.info('🦌 Reindeer 3 (Airdrops):');
-    logger.info(`   Total Distributed: ${airdropStats.totalDistributed.toFixed(6)} SOL`);
-    logger.info(`   Unique Recipients: ${airdropStats.uniqueRecipients.size}`);
-    logger.info('');
-    logger.info('🦌 Reindeer 4 (Treasury):');
-    logger.info(`   Total Transferred: ${treasuryStats.totalReceived.toFixed(6)} SOL`);
-    logger.info('═══════════════════════════════════════════════════════');
-    logger.info('');
+    console.log('');
+    console.log('\x1b[36m\x1b[1m╔═══════════════════════════════════════════════════════════════════════════╗\x1b[0m');
+    console.log('\x1b[36m\x1b[1m║                    🐋 WHALEMARKET SESSION SUMMARY 🐋                       ║\x1b[0m');
+    console.log('\x1b[36m\x1b[1m╚═══════════════════════════════════════════════════════════════════════════╝\x1b[0m');
+    console.log('');
+    console.log(`   \x1b[1mUPTIME:\x1b[0m ${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m ${uptime % 60}s`);
+    console.log('');
+
+    if (aiStats) {
+      console.log('   \x1b[32m┌─ opus (Decision Brain) ─────────────────────────────┐\x1b[0m');
+      console.log(`   \x1b[32m│\x1b[0m  Total Decisions: ${aiStats.totalDecisions}`);
+      console.log(`   \x1b[32m│\x1b[0m  Last Sentiment:  ${aiStats.lastSentiment || 'N/A'}`);
+      console.log(`   \x1b[32m│\x1b[0m  Last Confidence: ${aiStats.lastConfidence ?? 'N/A'}%`);
+      console.log('   \x1b[32m└─────────────────────────────────────────────────────┘\x1b[0m');
+      console.log('');
+    }
+
+    console.log('   \x1b[36m┌─ sonnet (Volume Creation) ─────────────────────────┐\x1b[0m');
+    console.log(`   \x1b[36m│\x1b[0m  Total Volume: ${volumeStats.totalVolume.toFixed(6)} SOL`);
+    console.log(`   \x1b[36m│\x1b[0m  Trades:       ${volumeStats.successfulTrades}/${volumeStats.tradeCount}`);
+    console.log('   \x1b[36m└─────────────────────────────────────────────────────┘\x1b[0m');
+    console.log('');
+
+    console.log('   \x1b[31m┌─ haiku (Buyback & Burn) ────────────────────────────┐\x1b[0m');
+    console.log(`   \x1b[31m│\x1b[0m  Tokens Burned: ${burnStats.totalBurned.toLocaleString()}`);
+    console.log(`   \x1b[31m│\x1b[0m  SOL Spent:     ${burnStats.totalSolSpent.toFixed(6)}`);
+    console.log('   \x1b[31m└─────────────────────────────────────────────────────┘\x1b[0m');
+    console.log('');
+
+    console.log('   \x1b[35m┌─ claude (Airdrop Distribution) ────────────────────┐\x1b[0m');
+    console.log(`   \x1b[35m│\x1b[0m  Total Distributed: ${airdropStats.totalDistributed.toFixed(6)} SOL`);
+    console.log(`   \x1b[35m│\x1b[0m  Unique Recipients: ${airdropStats.uniqueRecipients.size}`);
+    console.log('   \x1b[35m└─────────────────────────────────────────────────────┘\x1b[0m');
+    console.log('');
+
+    console.log('   \x1b[33m┌─ treasury ─────────────────────────────────────────┐\x1b[0m');
+    console.log(`   \x1b[33m│\x1b[0m  Total Transferred: ${treasuryStats.totalReceived.toFixed(6)} SOL`);
+    console.log(`   \x1b[33m│\x1b[0m  Fees Collected:    ${feeStats.totalCollected.toFixed(6)} SOL (${feeStats.claimCount} claims)`);
+    console.log('   \x1b[33m└─────────────────────────────────────────────────────┘\x1b[0m');
+    console.log('');
+    ascii.separator();
+    console.log('');
   }
 
   isActive(): boolean {
@@ -401,7 +499,8 @@ async function main(): Promise<void> {
     await bot.initialize();
     await bot.start();
 
-    logger.info('❄️ Frostbyte is running. Press Ctrl+C to stop.');
+    console.log('\x1b[32m\x1b[1m   🐋 WhaleMarket is running. Press Ctrl+C to stop.\x1b[0m');
+    console.log('');
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
     logger.error('Fatal error during startup', { error: errorMsg });

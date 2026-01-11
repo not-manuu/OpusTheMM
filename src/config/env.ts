@@ -55,6 +55,14 @@ export interface Config {
   telegramBotToken?: string;
   telegramAdminChatIds: number[];
 
+  // AI Decision Engine (optional)
+  anthropicApiKey?: string;
+  birdeyeApiKey?: string;
+  aiEnabled?: boolean;
+  aiModel?: string;
+  aiMaxTokens?: number;
+  aiMinDecisionInterval?: number;
+
   // Operational
   dryRun: boolean;
   logLevel: string;
@@ -141,6 +149,14 @@ function validateEnv(): Config {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
     telegramAdminChatIds: telegramChatIds,
 
+    // AI Decision Engine
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+    birdeyeApiKey: process.env.BIRDEYE_API_KEY,
+    aiEnabled: process.env.AI_ENABLED !== 'false', // Default to true if API key exists
+    aiModel: process.env.AI_MODEL || 'claude-sonnet-4-20250514',
+    aiMaxTokens: parseInt(process.env.AI_MAX_TOKENS || '4096'),
+    aiMinDecisionInterval: parseInt(process.env.AI_MIN_DECISION_INTERVAL || '60000'),
+
     // Operational
     dryRun: process.env.DRY_RUN === 'true',
     logLevel: process.env.LOG_LEVEL || 'info',
@@ -194,5 +210,7 @@ logger.info('Configuration loaded', {
   dryRun: config.dryRun,
   volumeWallets: config.volumeWalletKeys.length,
   telegramEnabled: !!config.telegramBotToken,
+  aiEnabled: !!config.anthropicApiKey && config.aiEnabled,
+  aiModel: config.aiModel,
   environment: config.nodeEnv,
 });

@@ -4,49 +4,68 @@ import { useState } from 'react';
 
 interface HeaderProps {
   isConnected: boolean;
+  isThinking?: boolean;
 }
 
-export function Header({ isConnected }: HeaderProps) {
+export function Header({ isConnected, isThinking }: HeaderProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('8VdoFhtW7FYTna5TyQSStvCUizvXZniSSJZwuY3ypump');
+    navigator.clipboard.writeText('ACA4EQhrUfCyzYuV21jQX6gpWU6dqbechE8HhKXbpump');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <header className="pixel-header mb-10">
-      <div className="flex flex-col gap-3">
-        <h1 className="font-pixel-headline text-base md:text-lg text-accent-red flex items-center gap-4" style={{ textShadow: '2px 2px 0 #fff' }}>
-          <span className="text-2xl">&#129420;</span>
-          Frostbyte Dashboard
-        </h1>
-        
-        <div className="flex items-center gap-2 text-sm md:text-base">
-          <span className="text-text-muted">Contract Address:</span>
-          <button
-            onClick={handleCopy}
-            className="text-accent-gold hover:text-accent-orange transition-colors cursor-pointer font-pixel-body"
-            title="Click to copy"
-          >
-            {copied ? 'Copied!' : '8VdoFhtW7FYTna5TyQSStvCUizvXZniSSJZwuY3ypump'}
-          </button>
+    <header className="claude-card mb-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-tertiary flex items-center justify-center">
+              <span className="text-2xl">*</span>
+            </div>
+            <div>
+              <h1 className="font-mono text-lg font-bold text-primary">
+                Opus the Market Maker
+              </h1>
+              <p className="text-xs text-muted">AI-Powered Tokenomics</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Status Indicators */}
+        <div className="flex items-center gap-4">
+          {/* AI Status */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-tertiary">
+            <div className={`status-indicator ${isThinking ? 'thinking' : 'online'}`} />
+            <span className="text-sm text-secondary">
+              {isThinking ? 'Analyzing' : 'AI Ready'}
+            </span>
+          </div>
+
+          {/* Connection Status */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-tertiary">
+            <div className={`status-indicator ${isConnected ? 'online' : 'offline'}`} />
+            <span className={`text-sm ${isConnected ? 'text-success' : 'text-error'}`}>
+              {isConnected ? 'Live' : 'Offline'}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 text-xl pulse">
-        <div
-          className={`w-3 h-3 ${
-            isConnected ? 'bg-[#00e676]' : 'bg-[#ff3333]'
-          }`}
-          style={{
-            boxShadow: isConnected ? '0 0 10px #00e676' : '0 0 10px #ff3333',
-          }}
-        />
-        <span className={isConnected ? 'text-accent-green' : 'text-accent-red'}>
-          {isConnected ? 'Connected' : 'Disconnected'}
-        </span>
+      {/* Contract Address Row */}
+      <div className="mt-4 pt-4 border-t border-subtle">
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-muted">Token:</span>
+          <button
+            onClick={handleCopy}
+            className="font-mono text-claude-coral hover:text-claude-amber transition-colors cursor-pointer"
+            title="Click to copy"
+          >
+            {copied ? 'Copied!' : 'ACA4EQhrUfCyzYuV21jQX6gpWU6dqbechE8HhKXbpump'}
+          </button>
+        </div>
       </div>
     </header>
   );

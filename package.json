@@ -12,6 +12,7 @@
     "test-phase2-3": "ts-node src/test-phase2-3.ts",
     "test-phase2-3-4": "ts-node src/test-phase2-3-4.ts",
     "test-all-reindeer": "ts-node src/test-all-reindeer.ts",
+    "test-ai-phases": "ts-node src/ai/test-phases-1-2.ts",
     "test-api": "ts-node src/test-api.ts",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts",
@@ -27,6 +28,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@coral-xyz/anchor": "^0.29.0",
     "@solana/spl-token": "^0.3.9",
     "@solana/web3.js": "^1.87.0",
