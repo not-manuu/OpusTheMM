@@ -1,8 +1,8 @@
-# 🧠 OpusMM
+# 🧠 Opus the Market Maker
 
-**Claude AI-powered tokenomics management for pump.fun tokens on Solana**
+**Claude Opus 4.5 AI-powered tokenomics management for pump.fun tokens on Solana**
 
-OpusMM combines automated fee collection with real-time **Claude AI** analysis to intelligently allocate creator fees across four parallel strategies. The system continuously streams Claude's reasoning in real-time, giving you complete transparency into every allocation decision through a "train of thought" interface.
+Opus the Market Maker combines automated fee collection with real-time **Claude Opus 4.5** analysis to intelligently allocate creator fees across four parallel strategies. The system continuously streams Claude's reasoning in real-time, giving you complete transparency into every allocation decision through a "train of thought" interface.
 
 ---
 
@@ -36,9 +36,9 @@ Fee Allocation Decision
 
 ---
 
-## 🧠 Claude AI Decision Engine
+## 🧠 Claude Opus 4.5 Decision Engine
 
-**OpusMM is powered by Anthropic's Claude 3.5 Sonnet**, a state-of-the-art AI model that analyzes market snapshots in real-time and makes dynamic allocation decisions. The entire decision process is streamed to your dashboard, showing you exactly what Claude is thinking.
+**Opus the Market Maker is powered by Anthropic's Claude Opus 4.5**, a state-of-the-art AI model that analyzes market snapshots in real-time and makes dynamic allocation decisions. The entire decision process is streamed to your dashboard, showing you exactly what Claude is thinking.
 
 ### Market Analysis via Claude
 Claude receives real-time market data via the Anthropic API:
@@ -72,7 +72,7 @@ Using Anthropic's Claude API, the model returns:
 ## ✨ Features
 
 - ✅ Automated fee collection from pump.fun bonding curve
-- ✅ **Claude 3.5 Sonnet AI analysis** - real-time market reasoning via Anthropic API
+- ✅ **Claude Opus 4.5 AI analysis** - real-time market reasoning via Anthropic API
 - ✅ **Streaming AI thoughts** - watch Claude think through each decision in real-time
 - ✅ Dynamic fee allocation powered by Claude's market analysis
 - ✅ **Transparent "train of thought" dashboard** - see Claude's full reasoning
@@ -179,9 +179,9 @@ market_data       - Current market snapshot (fed to Claude for analysis)
 
 ---
 
-## 📊 Dashboard - Powered by Claude AI
+## 📊 Dashboard - Powered by Claude Opus 4.5
 
-The dashboard displays real-time data with Claude AI integration:
+The dashboard displays real-time data with Claude Opus 4.5 integration:
 
 ### 🧠 AI Brain Component
 Watch Claude think in real-time:
@@ -310,7 +310,7 @@ MIT
 ## 🛠️ Tech Stack
 
 **AI & Decision Making:**
-- `@anthropic-ai/sdk` - Claude 3.5 Sonnet API integration
+- `@anthropic-ai/sdk` - Claude Opus 4.5 API integration
 - Streaming responses for real-time thought visualization
 
 **Blockchain:**
@@ -331,4 +331,4 @@ MIT
 
 ---
 
-**OpusMM: Claude AI meets pump.fun tokenomics** 🧠 🎯
+**Opus the Market Maker: Claude Opus 4.5 meets pump.fun tokenomics** 🧠 🎯
